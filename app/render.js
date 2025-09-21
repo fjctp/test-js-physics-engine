@@ -1,40 +1,42 @@
-// Fullscreen renderer with resize handling
-(function initRender() {
-  const appEl = document.getElementById('app');
-  const W = window.innerWidth;
-  const H = window.innerHeight;
+// app/render.js
+// Create and run renderer/runner with a concrete engine.
+
+export function createRenderer(engine) {
+  const appEl = document.getElementById("app");
+  const pr = window.devicePixelRatio || 1;
 
   const render = Matter.Render.create({
     element: appEl,
-    engine: window.engine,
+    engine,
     options: {
-      width: W,
-      height: H,
+      width: window.innerWidth,
+      height: window.innerHeight,
       wireframes: false,
-      background: '#10141f',
-      pixelRatio: window.devicePixelRatio || 1
+      background: "#10141f",
+      pixelRatio: pr
     }
   });
 
   Matter.Render.run(render);
 
-  // Expose
-  window.render = render;
-
   // Keep canvas full-screen on resize
-  function onResize() {
+  window.addEventListener("resize", () => {
     const w = window.innerWidth, h = window.innerHeight;
     render.canvas.width = w;
     render.canvas.height = h;
     render.options.width = w;
     render.options.height = h;
+  });
 
-    // Reframe to all bodies (simple way to keep things in view)
-    Matter.Render.lookAt(render, Matter.Composite.allBodies(window.world));
-  }
-  window.addEventListener('resize', onResize);
-
-  // Focus canvas for key input
-  render.canvas.setAttribute('tabindex', '0');
+  // Focus for keyboard input
+  render.canvas.setAttribute("tabindex", "0");
   render.canvas.focus();
-})();
+
+  return render;
+}
+
+export function startRunner(engine) {
+  const runner = Matter.Runner.create();
+  Matter.Runner.run(runner, engine);
+  return runner;
+}
