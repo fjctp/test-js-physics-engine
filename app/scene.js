@@ -1,15 +1,23 @@
-// app/scene.js
+// Scene: constructs the demo scene (table, box, walls) and adds it to the world.
+
 import { world } from "./engine.js";
 
+/**
+ * The dynamic box body created in the scene.
+ * @type {Matter.Body|undefined}
+ */
 export let box;
 
+/**
+ * Create scene bodies (table, box, walls) and add them to the world.
+ * @returns {void}
+ */
 export function setupScene() {
   const { Bodies, World } = Matter;
-
   const W = window.innerWidth;
   const H = window.innerHeight;
 
-  // Table
+  // A static rectangle acts as the table surface.
   const table = Bodies.rectangle(
     W / 2,
     H / 2 + 100,
@@ -18,7 +26,7 @@ export function setupScene() {
     { isStatic: true, render: { fillStyle: "#2a2f3a" } }
   );
 
-  // Box
+  // Dynamic box — friction and small restitution so it behaves like a block.
   const boxSize = 80;
   box = Bodies.rectangle(
     W / 2,
@@ -33,7 +41,7 @@ export function setupScene() {
     }
   );
 
-  // Walls
+  // Invisible walls outside the viewport prevent objects from drifting away.
   const wallOpts = { isStatic: true, render: { visible: false } };
   const walls = [
     Bodies.rectangle(W / 2, -50, W, 100, wallOpts),

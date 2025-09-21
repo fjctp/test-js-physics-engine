@@ -1,4 +1,5 @@
-// app/main.js
+// Main: app entry point, wires modules together and starts the simulation.
+
 import { engine, world } from "./engine.js";
 import { createRenderer, startRunner } from "./render.js";
 import { setupControls } from "./controls.js";
@@ -13,5 +14,5 @@ startRunner(engine);
 
 setupInputActions(engine, box);
 
-// Frame once bodies exist
+// Frame initial view so the renderer centers on all bodies we just created.
 Matter.Render.lookAt(render, Matter.Composite.allBodies(world));
