@@ -23,7 +23,7 @@ export function setupScene() {
     H / 2 + 100,
     Math.min(600, W * 0.8),
     20,
-    { isStatic: true, render: { fillStyle: "#2a2f3a" } }
+    { isStatic: true, render: { fillStyle: "#2a2f3a" } },
   );
 
   // Dynamic box — friction and small restitution so it behaves like a block.
@@ -37,8 +37,8 @@ export function setupScene() {
       restitution: 0.1,
       friction: 0.5,
       frictionAir: 0.02,
-      render: { fillStyle: "#4aa3ff" }
-    }
+      render: { fillStyle: "#4aa3ff" },
+    },
   );
 
   // Invisible walls outside the viewport prevent objects from drifting away.

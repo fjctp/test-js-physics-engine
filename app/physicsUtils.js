@@ -4,7 +4,7 @@
  * Linear force magnitude applied per tick when movement keys are held.
  * @type {number}
  */
-export const FORCE  = 0.0025;
+export const FORCE = 0.0025;
 
 /**
  * Torque magnitude used by applyTorque.
@@ -26,12 +26,12 @@ export const TORQUE = 0.0100;
 export function applyTorque(body, tau) {
   const { Body, Vector } = Matter;
   const halfW = Math.max(body.bounds.max.x - body.position.x, 1);
-  const rRight = Vector.add(body.position, { x:  halfW, y: 0 });
-  const rLeft  = Vector.add(body.position, { x: -halfW, y: 0 });
+  const rRight = Vector.add(body.position, { x: halfW, y: 0 });
+  const rLeft = Vector.add(body.position, { x: -halfW, y: 0 });
   const Fy = tau / halfW;
   // Apply vertical forces to create a couple (one up, one down).
   Body.applyForce(body, rRight, { x: 0, y: -Fy });
-  Body.applyForce(body, rLeft,  { x: 0, y:  Fy });
+  Body.applyForce(body, rLeft, { x: 0, y: Fy });
 }
 
 // Apply a force specified in the body's local frame. We rotate the local

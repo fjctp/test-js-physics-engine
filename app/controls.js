@@ -14,6 +14,10 @@ export const keyState = Object.create(null);
  */
 export function setupControls() {
   // Normalize to lower-case keys to simplify checks (e.g., 'W' -> 'w').
-  window.addEventListener('keydown', (e) => { keyState[e.key.toLowerCase()] = true; });
-  window.addEventListener('keyup',   (e) => { keyState[e.key.toLowerCase()] = false; });
+  window.addEventListener("keydown", (e) => {
+    keyState[e.key.toLowerCase()] = true;
+  });
+  window.addEventListener("keyup", (e) => {
+    keyState[e.key.toLowerCase()] = false;
+  });
 }

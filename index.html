@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Matter.js — Deno + ES Modules</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="./styles.css" />
-</head>
-<body>
-  <div id="hint">
-    <b>Controls</b>: W/A/S/D = Force, Q/E = Torque<br/>
-    Hold keys to keep applying.
-  </div>
+  <head>
+    <meta charset="utf-8" />
+    <title>Matter.js — Deno + ES Modules</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="hint">
+      <b>Controls</b>: W/A/S/D = Force, Q/E = Torque<br />
+      Hold keys to keep applying.
+    </div>
 
-  <div id="app"></div>
+    <div id="app"></div>
 
-  <!-- Provide Matter.js as window.Matter (simple & reliable in the browser) -->
-  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+    <!-- Provide Matter.js as window.Matter (simple & reliable in the browser) -->
+    <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
 
-  <!-- Your app entry as an ES module -->
-  <script type="module" src="./app/main.js"></script>
-</body>
+    <!-- Your app entry as an ES module -->
+    <script type="module" src="./app/main.js"></script>
+  </body>
 </html>

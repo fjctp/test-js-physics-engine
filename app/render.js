@@ -20,14 +20,14 @@ export function createRenderer(engine) {
       height: window.innerHeight,
       wireframes: false,
       background: "#10141f",
-      pixelRatio: pr
-    }
+      pixelRatio: pr,
+    },
   });
 
   Matter.Render.run(render);
 
   // Resize handler keeps canvas and Render options in sync with window size.
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", () => {
     const w = window.innerWidth, h = window.innerHeight;
     render.canvas.width = w;
     render.canvas.height = h;
@@ -36,7 +36,7 @@ export function createRenderer(engine) {
   });
 
   // Make the canvas focusable so keyboard input works when clicked.
-  render.canvas.setAttribute('tabindex', '0');
+  render.canvas.setAttribute("tabindex", "0");
   render.canvas.focus();
 
   return render;

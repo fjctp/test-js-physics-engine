@@ -10,7 +10,7 @@ export const engine = Matter.Engine.create();
  * The shared World owned by the engine.
  * @type {Matter.World}
  */
-export const world  = engine.world;
+export const world = engine.world;
 
 // Gravity is small for this demo so the box slides slowly on the table.
 world.gravity.y = 0.1;
