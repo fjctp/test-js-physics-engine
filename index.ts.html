@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Three.js TS One-Pager — Move a Box in X/Y</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --ui-bg:#0b0e14; --ui-fg:#e6e6e6; --ui-accent:#4aa3ff; }
+    html, body { height: 100%; margin: 0; }
+    #app { position: fixed; inset: 0; }
+    #ui {
+      position: fixed; left: 12px; top: 12px; z-index: 10;
+      font: 14px/1.3 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--ui-fg); background: #0008; backdrop-filter: blur(6px);
+      border: 1px solid #fff3; border-radius: 10px; padding: 10px 12px; min-width: 240px;
+    }
+    #ui label { display: grid; grid-template-columns: 42px 1fr 58px; gap: 8px; align-items: center; margin: 6px 0; }
+    #ui input[type="range"] { width: 100%; }
+    #ui input[type="number"] { width: 100%; }
+    #hint { opacity: .8; margin-top: 6px; font-size: 12px }
+    a { color: var(--ui-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <!-- three.js (global THREE) -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+  <!-- TypeScript compiler (to transpile inline TS on the fly) -->
+  <script src="https://cdn.jsdelivr.net/npm/typescript@5.5.4/lib/typescript.js"></script>
+
+  <!-- UI -->
+  <div id="ui">
+    <div><strong>Box Position</strong></div>
+    <label> x
+      <input id="xRange" type="range" min="-10" max="10" value="0" step="0.1">
+      <input id="xNum" type="number" min="-10" max="10" value="0" step="0.1">
+    </label>
+    <label> y
+      <input id="yRange" type="range" min="-10" max="10" value="0" step="0.1">
+      <input id="yNum" type="number" min="-10" max="10" value="0" step="0.1">
+    </label>
+    <div id="hint">Tip: use <b>W/A/S/D</b> or <b>arrow keys</b> to nudge.</div>
+  </div>
+
+  <div id="app"></div>
+
+  <!-- Your TypeScript code -->
+  <script type="text/typescript" id="ts-app">
+    /* Minimal 2D-like scene with an orthographic camera; move a box in x/y. */
+    declare const THREE: any;
+
+    // === Types ===
+    type XY = { x: number; y: number; };
+
+    // === DOM refs ===
+    const mount = document.getElementById('app') as HTMLDivElement;
+    const xRange = document.getElementById('xRange') as HTMLInputElement;
+    const yRange = document.getElementById('yRange') as HTMLInputElement;
+    const xNum   = document.getElementById('xNum')   as HTMLInputElement;
+    const yNum   = document.getElementById('yNum')   as HTMLInputElement;
+
+    // === Three.js core ===
+    const scene = new THREE.Scene();
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    mount.appendChild(renderer.domElement);
+
+    // World units we want visible vertically; camera recalculates with aspect.
+    const worldHeight = 20;
+    let camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 0.1, 100);
+    camera.position.set(0, 0, 10);
+
+    // === Box mesh ===
+    const geom = new THREE.BoxGeometry(2, 2, 2);
+    const mat  = new THREE.MeshBasicMaterial({ color: 0x44aa88 });
+    const box  = new THREE.Mesh(geom, mat);
+    scene.add(box);
+
+    // helpers: axes lines (so you can see origin)
+    function makeAxis(length: number, color: number) {
+      const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(length,0,0)]);
+      const m = new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.6 });
+      return new THREE.Line(g, m);
+    }
+    const axisX = makeAxis(12, 0xff5555);
+    const axisY = (() => {
+      const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0), new THREE.Vector3(0,12,0)]);
+      const m = new THREE.LineBasicMaterial({ color: 0x55aaff, transparent: true, opacity: 0.6 });
+      return new THREE.Line(g, m);
+    })();
+    scene.add(axisX, axisY);
+
+    // === State & controls ===
+    const state: XY = { x: 0, y: 0 };
+
+    function setPosition(x: number, y: number) {
+      state.x = x; state.y = y;
+      box.position.set(x, y, 0);
+      // keep UI in sync without infinite loops
+      if (document.activeElement !== xNum)   xNum.value   = x.toFixed(2);
+      if (document.activeElement !== yNum)   yNum.value   = y.toFixed(2);
+      if (document.activeElement !== xRange) xRange.value = String(x);
+      if (document.activeElement !== yRange) yRange.value = String(y);
+    }
+
+    // Input wiring (sliders & numbers mirror each other)
+    function bindPair(range: HTMLInputElement, num: HTMLInputElement, onChange: (v:number)=>void) {
+      const sync = (src: HTMLInputElement, dst: HTMLInputElement) => {
+        const v = Number(src.value);
+        dst.value = String(v);
+        onChange(v);
+      };
+      range.addEventListener('input', () => sync(range, num));
+      num.addEventListener('input',   () => sync(num, range));
+    }
+    bindPair(xRange, xNum, (v) => setPosition(v, state.y));
+    bindPair(yRange, yNum, (v) => setPosition(state.x, v));
+
+    // Keyboard nudges
+    const step = 0.2;
+    window.addEventListener('keydown', (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowLeft': case 'a': case 'A': setPosition(state.x - step, state.y); break;
+        case 'ArrowRight': case 'd': case 'D': setPosition(state.x + step, state.y); break;
+        case 'ArrowUp': case 'w': case 'W': setPosition(state.x, state.y + step); break;
+        case 'ArrowDown': case 's': case 'S': setPosition(state.x, state.y - step); break;
+      }
+    });
+
+    // Resize handling: keep a worldHeight in view; adjust left/right by aspect
+    function onResize() {
+      const { innerWidth:w, innerHeight:h } = window;
+      renderer.setSize(w, h);
+      const aspect = w / h;
+      const halfH = worldHeight / 2;
+      const halfW = halfH * aspect;
+      camera.left   = -halfW;
+      camera.right  =  halfW;
+      camera.top    =  halfH;
+      camera.bottom = -halfH;
+      camera.near   = 0.1;
+      camera.far    = 100;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', onResize);
+    onResize();
+
+    // Render loop
+    function render() {
+      requestAnimationFrame(render);
+      renderer.render(scene, camera);
+    }
+    render();
+
+    // Initial position
+    setPosition(0, 0);
+
+    // Expose for debugging in console:
+    (window as any).setPosition = setPosition;
+    (window as any).THREE = THREE;
+  </script>
+
+  <!-- Tiny bootstrap: transpile the TS above and execute it -->
+  <script>
+    (function boot() {
+      const tsSrc = document.getElementById('ts-app').textContent;
+      // @ts-ignore - global "ts" provided by the compiler script above
+      const out = window.ts.transpileModule(tsSrc, {
+        compilerOptions: {
+          target: "ES2020", module: "ES2020", strict: true, sourceMap: false
+        }
+      }).outputText;
+      // Run with THREE in global scope (already loaded); top-level is fine
+      new Function(out)();
+    })();
+  </script>
+</body>
+</html>
