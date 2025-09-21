@@ -49,6 +49,14 @@
   const FORCE  = 0.0025;   // linear force per tick
   const TORQUE = 0.0100;  // torque magnitude (applied as a force couple)
 
+  // Apply forces {x, y} to body in body frame.
+  function applyForceBody(body, forcesBody) {
+    const forceWorld = Matter.Vector.rotate(forcesBody, body.angle);
+    console.log(forcesBody, body.angle, forceWorld);
+    Body.applyForce(body, body.position, forceWorld);
+  }
+
+  // Apply torque to body.
   function applyTorque(body, tau) {
     // Approximate lever arm using half-width in world coords
     const halfW = Math.max(body.bounds.max.x - body.position.x, 1);
@@ -67,10 +75,10 @@
   Events.on(window.engine, 'beforeUpdate', () => {
     const ks = window.keyState || {};
     // Matter.js screen coords: +y is downward
-    if (ks['w']) Body.applyForce(box, box.position, { x: 0, y: -FORCE }); // up
-    if (ks['s']) Body.applyForce(box, box.position, { x: 0, y:  FORCE }); // down
-    if (ks['a']) Body.applyForce(box, box.position, { x: -FORCE, y: 0 }); // left
-    if (ks['d']) Body.applyForce(box, box.position, { x:  FORCE, y: 0 }); // right
+    if (ks['w']) applyForceBody(box, { x: 0, y: -FORCE }); // up
+    if (ks['s']) applyForceBody(box, { x: 0, y:  FORCE }); // down
+    if (ks['a']) applyForceBody(box, { x: -FORCE, y: 0 }); // left
+    if (ks['d']) applyForceBody(box, { x:  FORCE, y: 0 }); // right
     if (ks['q']) applyTorque(box,  TORQUE);  // CCW
     if (ks['e']) applyTorque(box, -TORQUE);  // CW
   });
